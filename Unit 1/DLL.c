@@ -1,365 +1,213 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include<stdio.h>
+#include<stdlib.h>
 
-typedef struct node {
+typedef struct node{
+    struct node* prev;
     int data;
-    struct node *prev, *next;
-} Node;
+    struct node* next;
+}NODE;
 
-typedef struct list {
-    Node* head;
-    int no_of_elements;
-} List;
 
-List* init_list();
-void display(List*);
-void destroy_list(List*);
-void insert_front(List*, int);
-void insert_end(List*, int);
-void insert_pos(List*, int, int);
-void delete_front(List*);
-void delete_end(List*);
-void delete_pos(List*, int);
-void delete_val(List*, int);
+//function declaration
+NODE* add_to_empty(NODE*, int);
+NODE* insert_at_beg(NODE* head, int data);
+NODE* insert_at_end(NODE* head, int data);
+NODE* insert_pos(NODE* head, int data, int pos);
+NODE* init_node(int data);
 
-int main() {
-    List *list = NULL;
+NODE* del_first_m1(NODE* head);
+NODE* del_first_m2(NODE* head);
+NODE* del_last(NODE* head);
+NODE* del_post(NODE* head, int pos);
 
-    list = init_list();
+NODE* create_list(NODE*);
+void display(NODE*);
+
+
+int main()
+{
+	NODE *head=NULL;
+	
+	printf("\n-------------------------------------------------------\n");
+	head=add_to_empty(head,45);
+	printf("Display after adding to empty list \n%d",head->data);
+	
+	printf("\n-------------------------------------------------------\n");
+	printf("Inserting at the beginning\n");
+	head=insert_at_beg(head,34);
+	display(head);
+	
+	printf("\n-------------------------------------------------------\n");
+	printf("Inserting at the ending\n");
+	head=insert_at_end(head,9);
+	display(head);
+
+	printf("\n-------------------------------------------------------\n");
+	printf("Inserting IN Between\n");
+	int pos=2;
+	head=add_after_pos(head,25,pos);
+	display(head);
+	
+	printf("\n-------------------------------------------------------\n");
+	printf("creating the list\n");
+	head=create_list(head);
+	display(head);
+	
+	printf("\n-------------------------------------------------------\n");
+	printf("deleted the first node from the list method 1\n");
+	head=del_first_m1(head);
+	display(head);
+	
+	printf("\n-------------------------------------------------------\n");
+	printf("deleted the first node from the list using method 2\n");
+	head=del_first_m2(head);
+	display(head);
+	
+	printf("\n-------------------------------------------------------\n");
+	printf("deleted the last node from the list\n");
+	head=del_last(head);
+	display(head);
+	
+	int pos1=2;
+	printf("\n-------------------------------------------------------\n");
+	printf("deleted the intermediate node from the list\n");
+	head=del_pos(head,pos1);
+	display(head);
+	return 0;
+	
+}
+
+
+//function definition
+NODE* init_node(int data){
+    NODE* temp = (NODE*)malloc(sizeof(NODE));
+    temp->data=data;
+    temp->next=temp->prev=NULL;
+    return temp;
+}
+
+NODE* add_to_empty(NODE* head, int data){
+    NODE* temp = init_node(data);
+    head = temp;
+    return head;
+}
+
+NODE* insert_at_beg(NODE* head, int data){
+    NODE* temp = init_node(data);
+    temp->next = head;
+    head->prev = temp;
+
+    return head;
+}
+
+NODE* insert_at_end(NODE* head, int data){
+    NODE* temp = init_node(data);
+    NODE* tp = head;
+
+    while(tp->next!=NULL)
+        tp=tp->next;
     
+    tp->next=temp;
+    temp->prev=tp;
 
-    int ch;
-    int data;
-
-    while (1) {
-        printf("\n\nMAIN MENU\n\n");
-        printf("1. Insert element to front\n");
-        printf("2. Insert element to end\n");
-        printf("3. Insert into any position\n");   
-        printf("4. Delete element at front\n");
-        printf("5. Delete element at end\n");
-        printf("6. Delete element from any position\n"); 
-        printf("7. Delete first occurance of value\n");
-        printf("8. Display\n");
-        printf("9. Exit\n");
-
-        printf("\nYour choice: ");
-        scanf("%d", &ch);
-
-        switch (ch) {
-            case 1: {
-                // Front insert
-                printf("Enter number: ");
-                scanf("%d", &data);
-                insert_front(list, data);
-                display(list);
-                break;
-            }
-            case 2: {
-                // End insert
-                printf("Enter number: ");
-                scanf("%d", &data);
-                insert_end(list, data);
-                display(list);
-                break;
-            }
-            case 3: {
-                // Insert pos
-                int pos, val;
-                printf("Enter position (1-based index): ");
-                scanf("%d", &pos);
-                printf("Enter value: ");
-                scanf("%d", &val);
-                insert_pos(list, pos, val);
-                display(list);
-                break;
-            }
-            case 4: {
-                // Delete front
-                delete_front(list);
-                display(list);
-                break;
-            }
-            case 5: {
-                // Delete end
-                delete_end(list);
-                display(list);
-                break;
-            }
-            case 6: {
-                // Delete pos
-                int pos;
-                printf("Enter position (1-based index): ");
-                scanf("%d", &pos);
-                delete_pos(list, pos);
-                display(list);
-                break;
-            }
-            case 7: {
-                // Delete val
-                int val;
-                printf("Enter value: ");
-                scanf("%d", &val);
-                delete_val(list, val);
-                display(list);
-                break;
-            }
-            case 8: {
-                // Display
-                display(list);
-                break;
-            }
-            case 9: {
-                // Exit
-                destroy_list(list);
-                return 0;
-            }
-            default: {
-                printf("Invalid input\n");
-                continue;
-            }
-        }
-    }
-    destroy_list(list);
-    return 0;
+    return head;
 }
 
-List* init_list() {
-    List *list = (List*) malloc(sizeof(List));
-    list->head = NULL;
-    list->no_of_elements = 0;
-    return list;
+NODE* del_first_m1(NODE* head){
+    head = head->next;
+    free(head->prev);
+    head->prev=NULL;
+    return head;
 }
 
-void destroy_list(List *list) {
-    Node *temp = list->head, *to_delete = NULL;
+NODE* insert_pos(NODE* head, int data, int pos){
+    NODE* temp = init_node(data);
+    NODE* temp3, *temp2 = head;
 
-    while (temp != NULL) {
-        if (to_delete != NULL) {
-            free(to_delete);
-        } 
-        to_delete = temp;
-        temp = temp->next;
-        
-    }
-
-    if (list != NULL) {
-        free(list);
-    }
-
-}
-
-void insert_front(List *list, int val) {
-    Node *traverse = list->head;
-    Node* new_node = NULL;
-
-    new_node = (Node*) malloc(sizeof(Node));
-    new_node->data = val;
-    new_node->prev = NULL;
-    new_node->next = traverse;
-    ++list->no_of_elements;
+    if(pos==1)
+        insert_at_beg(head, data);
     
-    // If not first node
-    if (traverse != NULL) {
-        traverse->prev = new_node;
+    while(pos>1){
+        pos--;
+        temp2=temp2->next;
     }
-    
-    list->head = new_node;
-    
+
+    temp3 = temp2->prev;
+    temp->prev = temp3;
+    temp->next = temp2;
+    temp3->next = temp;
+    temp2->prev=temp;
 }
 
-void insert_end(List *list, int val) {
-    Node *traverse = list->head;
-    Node* new_node = NULL;
-
-    ++list->no_of_elements;
-
-    // First node
-    if (traverse == NULL) {
-        new_node = (Node*) malloc(sizeof(Node));
-        new_node->data = val;
-        new_node->next = NULL;
-        new_node->prev = traverse;
-        list->head = new_node;
-        return;
-    }
-
-    while (traverse->next != NULL) {
-        traverse = traverse->next;
-    }
-
-    new_node = (Node*) malloc(sizeof(Node));
-    traverse->next = new_node;
-    new_node->data = val;
-    new_node->next = NULL;
-    new_node->prev = traverse;
-}   
-
-void insert_pos(List *list, int pos, int val) {
-    Node *traverse = list->head;
-    Node* new_node = NULL;
-
-    // List is empty
-    if (traverse == NULL) {
-        new_node = (Node*) malloc(sizeof(Node));
-        new_node->data = val;
-        new_node->next = NULL;
-        new_node->prev = NULL;
-        list->head = new_node;
-        ++list->no_of_elements;
-        return;
-    }
-    int counter = 1;
-
-    while (traverse != NULL) {
-        // Position found, insert after
-        if (pos == counter) {
-            new_node = (Node*) malloc(sizeof(Node));
-            new_node->data = val;
-
-            // Set next and next's prev
-            new_node->next = traverse->next;
-            if (traverse->next != NULL) {
-                (traverse->next)->prev = new_node;
-            }
-            
-            // Set prev and prev's next
-            traverse->next = new_node;
-            new_node->prev = traverse;
-            ++list->no_of_elements;
-            return;
-
-        }
-        traverse = traverse->next;
-        ++counter;
-    }
-}
-
-void delete_front(List *list) {
-    if (list->head == NULL) {
-        printf("List is empty\n");
-        return;
-    }
-
-    Node* temp = list->head;
-    list->head->next->prev = NULL;
-    list->head = list->head->next;
+NODE* del_first_m2(NODE* head){
+    //by creating temp variable
+    NODE* temp = head;
+    head = head->next;
     free(temp);
-    --list->no_of_elements;
+    temp=NULL;
+    head->prev=NULL;
+    return head;
 }
 
-void delete_end(List *list) {
-    if (list->head == NULL) {
-        printf("List is empty\n");
-        return;
-    }
-    Node *traverse = list->head;
-    Node *to_del = NULL;
+NODE* del_last(NODE* head){
+    NODE* temp = head;
+    NODE* temp2;
 
-    if (list->head->next == NULL) {
-        to_del = list->head;
-        list->head = NULL;
-        free(to_del);
-        --list->no_of_elements;
-        return;
+    while(temp->next!=NULL){
+        temp=temp->next;
     }
 
-    while (traverse->next != NULL) {
-        traverse = traverse->next;
-    }
+    temp2 = temp->prev;
+    temp2->next = NULL;
+    free(temp);
+    temp=NULL;
 
-
-    to_del = traverse;
-    traverse->prev->next = NULL;
-    free(to_del);
-    --list->no_of_elements;
-
+    return head;
 }
 
-void delete_pos(List *list, int pos) {
-    // List is empty
-    if (list->head == NULL) {
-        printf("List is empty\n");
-        return;
+NODE* del_post(NODE* head, int pos){
+    NODE* temp=head;
+    NODE* temp2;
+    while(pos>1){
+        pos--;
+        temp=temp->next;
     }
 
-    Node *traverse = list->head;
-    Node* to_del = NULL;
+    temp2=temp->prev;
+    temp2->next=temp->next;
+    temp->next->prev=temp2;
 
-    int counter = 1;
-
-    while (traverse != NULL) {
-        // Position found, value
-        if (pos == counter) {
-            to_del = traverse;
-
-            // If not first node
-            if (traverse->prev != NULL) {
-                traverse->prev->next = traverse->next;
-            }
-            // First node
-            else {
-                list->head = list->head->next;
-            }
-            // If not last node
-            if (traverse->next != NULL) {
-                traverse->next->prev = traverse->prev;
-            }
-            
-            free(to_del);
-            --list->no_of_elements;
-            return;
-
-        }
-        traverse = traverse->next;
-        ++counter;
-    }
+    return head;
 }
 
-void delete_val(List *list, int val) {
-    // List is empty
-    if (list->head == NULL) {
-        printf("List is empty\n");
-        return;
-    }
-
-    Node *traverse = list->head;
-    Node* to_del = NULL;
-
-
-    while (traverse != NULL) {
-        // Value found, delete
-        if (val == traverse->data) {
-            to_del = traverse;
-
-            // If not first node
-            if (traverse->prev != NULL) {
-                traverse->prev->next = traverse->next;
-            }
-            // First node
-            else {
-                list->head = list->head->next;
-            }
-            // If not last node
-            if (traverse->next != NULL) {
-                traverse->next->prev = traverse->prev;
-            }
-            
-            free(to_del);
-            --list->no_of_elements;
-            return;
-
-        }
-        traverse = traverse->next;
-    }
+NODE* create_list(NODE* head)
+{
+	int n,data,i;
+	printf("Enter the number of nodes:");
+	scanf("%d",&n);
+	
+	if(n==0)
+		return head;
+	
+	//creating complete list at a time 
+	for(i=1;i<=n;i++)
+	{
+		printf("Enter the element for the node %d:",i);
+		scanf("%d",&data);
+		head=insert_at_end(head,data);
+	}
+	return head;
 }
 
-void display(List *list) {
-    Node *traverse = list->head;
-
-    while (traverse != NULL) {
-        printf("%d->", traverse->data);
-        traverse = traverse->next;
-    }
-    printf("NULL\n");
+void display(NODE* head)
+{
+	if(head!=NULL)
+	{
+		NODE *ptr=head;
+		while(ptr != NULL)
+		{
+			printf("%d\t",ptr->data);
+			ptr = ptr->next;
+		}
+	}
 }
